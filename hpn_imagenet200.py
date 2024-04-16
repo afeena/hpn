@@ -22,7 +22,7 @@ from torchvision import datasets, transforms
 
 import helper
 sys.path.append("models/imagenet200/")
-from .models.imagenet200 import densenet, resnet
+from models.imagenet200 import densenet, resnet
     
 
 ################################################################################
