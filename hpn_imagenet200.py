@@ -18,11 +18,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from   torchvision import datasets, transforms
+from torchvision import datasets, transforms
 
 import helper
 sys.path.append("models/imagenet200/")
-import densenet, resnet
+from .models.imagenet200 import densenet, resnet
     
 
 ################################################################################
@@ -66,10 +66,9 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch):
         newloss = avgloss / avglosscount
         
         # Print updates.
-        print "Training epoch %d: loss %8.4f - %.0f\r" \
-                %(epoch, newloss, 100.*(bidx+1)/len(trainloader)),
-        sys.stdout.flush()
-    print
+        print("Training epoch %d: loss %8.4f - %.0f\r" \
+                %(epoch, newloss, 100.*(bidx+1)/len(trainloader)))
+    print()
 
 ################################################################################
 # Testing epoch.
@@ -93,7 +92,7 @@ def main_test(model, device, testloader):
         for data, target in testloader:
             # Data to device.
             data = torch.autograd.Variable(data).cuda()
-            target = target.cuda(async=True)
+            target = target.cuda()
             target = torch.autograd.Variable(target)
             
             # Forward.
@@ -105,8 +104,8 @@ def main_test(model, device, testloader):
     
     # Print results.
     testlen = len(testloader.dataset)
-    print "Testing: classification accuracy: %d/%d - %.3f" \
-            %(acc, testlen, 100. * acc / testlen)
+    print("Testing: classification accuracy: %d/%d - %.3f" \
+            %(acc, testlen, 100. * acc / testlen))
     return acc / float(testlen)
 
 ################################################################################
@@ -121,7 +120,6 @@ def parse_args():
     parser.add_argument("--datadir", dest="datadir", default="dat/", type=str)
     parser.add_argument("--resdir", dest="resdir", default="res/", type=str)
     parser.add_argument("--hpnfile", dest="hpnfile", default="", type=str)
-
     parser.add_argument("-n", dest="network", default="resnet32", type=str)
     parser.add_argument("-r", dest="optimizer", default="sgd", type=str)
     parser.add_argument("-l", dest="learning_rate", default=0.01, type=float)
@@ -180,8 +178,8 @@ if __name__ == "__main__":
     # Main loop.
     testscores = []
     learning_rate = args.learning_rate
-    for i in xrange(args.epochs):
-        print "---"
+    for i in range(args.epochs):
+        print("---")
         # Learning rate decay.
         if i in [args.drop1, args.drop2]:
             learning_rate *= 0.1
