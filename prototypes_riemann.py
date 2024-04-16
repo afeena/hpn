@@ -30,11 +30,12 @@ def parse_args():
     parser.add_argument('-d', dest="dims", default=100, type=int)
     parser.add_argument('-l', dest="learning_rate", default=0.1, type=float)
     parser.add_argument('-m', dest="momentum", default=0.9, type=float)
-    parser.add_argument('-e', dest="epochs", default=10000, type=int, )
+    parser.add_argument('-e', dest="epochs", default=10000, type=int)
     parser.add_argument('-s', dest="seed", default=300, type=int)
     parser.add_argument('-r', dest="resdir", default="", type=str)
     parser.add_argument('-w', dest="wtvfile", default="", type=str)
     parser.add_argument('-n', dest="nn", default=2, type=int)
+    parser.add_argument('-o', dest="optim", default="sgd", type=str)
     args = parser.parse_args()
     return args
 
@@ -105,8 +106,12 @@ if __name__ == "__main__":
     # Initialize prototypes.
     prototypes = torch.randn(args.classes, args.dims)
     prototypes = geoopt.ManifoldParameter(F.normalize(prototypes, p=2, dim=1), manifold=geoopt.SphereExact())
-    optimizer = geoopt.optim.RiemannianSGD([prototypes], lr=args.learning_rate, momentum=args.momentum, stabilize=1)
-
+    if args.optim == "sgd":
+        optimizer = geoopt.optim.RiemannianSGD([prototypes], lr=args.learning_rate, momentum=args.momentum, stabilize=1)
+    elif args.optim == "adam":
+        optimizer = geoopt.optim.RiemannianAdam([prototypes], lr=args.learning_rate, stabilize=1)
+    else:
+        raise ValueError("Unknown optimizer")
     # Optimize for separation.
     for i in range(args.epochs):
         # Compute loss.
