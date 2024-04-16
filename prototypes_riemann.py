@@ -35,7 +35,7 @@ def parse_args():
     parser.add_argument('-r', dest="resdir", default="", type=str)
     parser.add_argument('-w', dest="wtvfile", default="", type=str)
     parser.add_argument('-n', dest="nn", default=2, type=int)
-    parser.add_argument('-o', dest="optim", default="sgd", type=str)
+    parser.add_argument('-o', dest="optim", default="rsgd", type=str)
     args = parser.parse_args()
     return args
 
@@ -106,9 +106,9 @@ if __name__ == "__main__":
     # Initialize prototypes.
     prototypes = torch.randn(args.classes, args.dims)
     prototypes = geoopt.ManifoldParameter(F.normalize(prototypes, p=2, dim=1), manifold=geoopt.SphereExact())
-    if args.optim == "sgd":
+    if args.optim == "rsgd":
         optimizer = geoopt.optim.RiemannianSGD([prototypes], lr=args.learning_rate, momentum=args.momentum, stabilize=1)
-    elif args.optim == "adam":
+    elif args.optim == "radam":
         optimizer = geoopt.optim.RiemannianAdam([prototypes], lr=args.learning_rate, stabilize=1)
     else:
         raise ValueError("Unknown optimizer")
