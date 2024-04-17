@@ -12,7 +12,7 @@ import argparse
 import os
 import random
 import sys
-
+import ledoh_torch
 import geoopt
 import numpy as np
 import torch
@@ -36,6 +36,8 @@ def parse_args():
     parser.add_argument('-w', dest="wtvfile", default="", type=str)
     parser.add_argument('-n', dest="nn", default=2, type=int)
     parser.add_argument('-o', dest="optim", default="rsgd", type=str)
+    parser.add_argument('--disp', dest="dispersion", default=None, type=str)
+    parser.add_argument('--dispw', dest="dispersion_weight", default=0, type=float)
     args = parser.parse_args()
     return args
 
@@ -121,12 +123,23 @@ if __name__ == "__main__":
             loss = loss1 + loss2
         else:
             loss = loss1
+
+        if args.dispersion=='mmd':
+            disp_loss = ledoh_torch.kernel_dispersion.KernelSphereDispersion().forward(prototypes)
+        elif args.dispersion=='lloyd':
+            disp_loss = ledoh_torch.lloyd_dispersion.LloydSphereDispersion().forward(prototypes)
+        elif args.dispersion=='sliced':
+            disp_loss = ledoh_torch.sliced_dispersion.SlicedSphereDispersion().forward(prototypes, p=None, q=None)
+        else:
+            disp_loss = None
         # Update.
+
+        if disp_loss is not None:
+            loss += args.dispersion_weight * disp_loss
+
         loss.backward()
         optimizer.step()
-        # Renormalize prototypes.
-        prototypes = nn.Parameter(F.normalize(prototypes, p=2, dim=1))
-        optimizer = optim.SGD([prototypes], lr=args.learning_rate, momentum=args.momentum)
+        optimizer.zero_grad()
         print("%03d/%d: %.4f\r" % (i, args.epochs, sep))
 
     # Store result.
