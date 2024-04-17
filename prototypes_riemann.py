@@ -84,6 +84,7 @@ if __name__ == "__main__":
 
     # Initialize prototypes and optimizer.
     if os.path.exists(args.wtvfile):
+        print(f"initialiing prototypes with w2vec file {args.wtvfile}")
         use_wtv = True
         wtvv = np.load(args.wtvfile)
         for i in range(wtvv.shape[0]):
