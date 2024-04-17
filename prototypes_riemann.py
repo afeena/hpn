@@ -98,10 +98,10 @@ if __name__ == "__main__":
             others.append(sorder[args.nn:-1])
         triplets = []
         for i in range(wtvv.shape[0]):
-            for j in range(len(nns[i])):
-                for k in range(len(others[i])):
+            for j in nns[i]:
+                for k in others[i]:
                     triplets.append([i, j, i, k])
-        triplets = torch.from_numpy(np.array(triplets).astype(int)).to(device)
+        triplets = torch.tensor(triplets, device=device, dtype=torch.int)
     else:
         use_wtv = False
 
