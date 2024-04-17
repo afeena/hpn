@@ -86,15 +86,14 @@ if __name__ == "__main__":
     if os.path.exists(args.wtvfile):
         print(f"initialiing prototypes with w2vec file {args.wtvfile}")
         use_wtv = True
-        wtvv = np.load(args.wtvfile)
-        for i in range(wtvv.shape[0]):
-            wtvv[i] /= np.linalg.norm(wtvv[i])
+        wtvv = torch.from_numpy(np.load(args.wtvfile)).float().to(device)
+        wtvv = F.normalize(wtvv, p=2, dim=1)
         wtvsim = torch.matmul(wtvv, wtvv.t()).float()
 
         # Precompute triplets.
         nns, others = [], []
         for i in range(wtvv.shape[0]):
-            sorder = np.argsort(wtvsim[i, :])[::-1]
+            sorder = torch.argsort(wtvsim[i, :])[::-1]
             nns.append(sorder[:args.nn])
             others.append(sorder[args.nn:-1])
         triplets = []
@@ -102,7 +101,7 @@ if __name__ == "__main__":
             for j in range(len(nns[i])):
                 for k in range(len(others[i])):
                     triplets.append([i, j, i, k])
-        triplets = np.array(triplets).astype(int)
+        triplets = torch.from_numpy(np.array(triplets).astype(int)).to(device)
     else:
         use_wtv = False
 
