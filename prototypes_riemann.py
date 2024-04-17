@@ -119,7 +119,7 @@ if __name__ == "__main__":
         # Compute loss.
         loss1, sep = prototype_loss(prototypes)
         if use_wtv:
-            loss2 = prototype_loss_sem(prototypes, triplets)
+            loss2, _ = prototype_loss_sem(prototypes, triplets)
             loss = loss1 + loss2
         else:
             loss = loss1
