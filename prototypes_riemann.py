@@ -106,7 +106,7 @@ if __name__ == "__main__":
         use_wtv = False
 
     # Initialize prototypes.
-    prototypes = torch.randn(args.classes, args.dims)
+    prototypes = torch.randn(args.classes, args.dims, device=device)
     prototypes = geoopt.ManifoldParameter(F.normalize(prototypes, p=2, dim=1), manifold=geoopt.SphereExact())
     if args.optim == "rsgd":
         optimizer = geoopt.optim.RiemannianSGD([prototypes], lr=args.learning_rate, momentum=args.momentum, stabilize=1)
