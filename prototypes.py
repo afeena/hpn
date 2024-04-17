@@ -79,21 +79,21 @@ if __name__ == "__main__":
     if os.path.exists(args.wtvfile):
         use_wtv = True
         wtvv = np.load(args.wtvfile)
-        for i in xrange(wtvv.shape[0]):
+        for i in range(wtvv.shape[0]):
             wtvv[i] /= np.linalg.norm(wtvv[i])
-        wtvv = torch.from_numpy(wtvvectors)
+        #wtvv = torch.from_numpy(wtvvectors)
         wtvsim = torch.matmul(wtvv, wtvv.t()).float()
         
         # Precompute triplets.
         nns, others = [], []
-        for i in xrange(wtvv.shape[0]):
+        for i in range(wtvv.shape[0]):
             sorder = np.argsort(wtvsim[i,:])[::-1]
             nns.append(sorder[:args.nn])
             others.append(sorder[args.nn:-1])
         triplets = []
-        for i in xrange(wtvv.shape[0]):
-            for j in xrange(len(nns[i])):
-                for k in xrange(len(others[i])):
+        for i in range(wtvv.shape[0]):
+            for j in range(len(nns[i])):
+                for k in range(len(others[i])):
                     triplets.append([i,j,i,k])
         triplets = np.array(triplets).astype(int)
     else:
@@ -106,7 +106,7 @@ if __name__ == "__main__":
             momentum=args.momentum)
 
     # Optimize for separation.
-    for i in xrange(args.epochs):
+    for i in range(args.epochs):
         # Compute loss.
         loss1, sep = prototype_loss(prototypes)
         if use_wtv:
@@ -121,9 +121,8 @@ if __name__ == "__main__":
         prototypes = nn.Parameter(F.normalize(prototypes, p=2, dim=1))
         optimizer = optim.SGD([prototypes], lr=args.learning_rate, \
                 momentum=args.momentum)
-        print "%03d/%d: %.4f\r" %(i, args.epochs, sep),
-        sys.stdout.flush()
-    print
+        print("%03d/%d: %.4f\r" %(i, args.epochs, sep))
+    print()
     
     # Store result.
     np.save(args.resdir + "prototypes-%dd-%dc.npy" %(args.dims, args.classes), \
