@@ -93,7 +93,7 @@ if __name__ == "__main__":
         # Precompute triplets.
         nns, others = [], []
         for i in range(wtvv.shape[0]):
-            sorder = torch.argsort(wtvsim[i, :])[::-1]
+            sorder = torch.argsort(wtvsim[i, :], descending=True)
             nns.append(sorder[:args.nn])
             others.append(sorder[args.nn:-1])
         triplets = []
