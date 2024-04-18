@@ -63,9 +63,7 @@ def prototype_loss_sem(prototypes, triplets):
 if __name__ == "__main__":
     # Parse user arguments.
     args = parse_args()
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     device = torch.device("cuda")
-    kwargs = {'num_workers': 64, 'pin_memory': True}
 
     # Set seed.
     seed = args.seed
@@ -77,40 +75,38 @@ if __name__ == "__main__":
 
     # Initialize prototypes and optimizer.
     if os.path.exists(args.wtvfile):
+        print(f"initialiing prototypes with w2vec file {args.wtvfile}")
         use_wtv = True
-        wtvv = np.load(args.wtvfile)
-        for i in range(wtvv.shape[0]):
-            wtvv[i] /= np.linalg.norm(wtvv[i])
-        #wtvv = torch.from_numpy(wtvvectors)
+        wtvv = torch.from_numpy(np.load(args.wtvfile)).float().to(device)
+        wtvv = F.normalize(wtvv, p=2, dim=1)
         wtvsim = torch.matmul(wtvv, wtvv.t()).float()
-        
+
         # Precompute triplets.
         nns, others = [], []
         for i in range(wtvv.shape[0]):
-            sorder = np.argsort(wtvsim[i,:])[::-1]
+            sorder = torch.argsort(wtvsim[i, :], descending=True)
             nns.append(sorder[:args.nn])
             others.append(sorder[args.nn:-1])
         triplets = []
         for i in range(wtvv.shape[0]):
-            for j in range(len(nns[i])):
-                for k in range(len(others[i])):
-                    triplets.append([i,j,i,k])
-        triplets = np.array(triplets).astype(int)
+            for j in nns[i]:
+                for k in others[i]:
+                    triplets.append([i, j, i, k])
+        triplets = torch.tensor(triplets, device=device, dtype=torch.int)
     else:
         use_wtv = False
-    
+
     # Initialize prototypes.
-    prototypes = torch.randn(args.classes, args.dims)
+    prototypes = torch.randn(args.classes, args.dims, device=device)
     prototypes = nn.Parameter(F.normalize(prototypes, p=2, dim=1))
-    optimizer = optim.SGD([prototypes], lr=args.learning_rate, \
-            momentum=args.momentum)
+    optimizer = optim.SGD([prototypes], lr=args.learning_rate, momentum=args.momentum)
 
     # Optimize for separation.
     for i in range(args.epochs):
         # Compute loss.
         loss1, sep = prototype_loss(prototypes)
         if use_wtv:
-            loss2 = prototype_loss_sem(prototypes, triplets)
+            loss2, _ = prototype_loss_sem(prototypes, triplets)
             loss = loss1 + loss2
         else:
             loss = loss1
