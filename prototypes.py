@@ -115,11 +115,11 @@ if __name__ == "__main__":
         optimizer.step()
         # Renormalize prototypes.
         prototypes = nn.Parameter(F.normalize(prototypes, p=2, dim=1))
-        optimizer = optim.SGD([prototypes], lr=args.learning_rate, \
+        optimizer = optim.SGD([prototypes], lr=args.learning_rate,
                 momentum=args.momentum)
-        print("%03d/%d: %.4f\r" %(i, args.epochs, sep))
+        print(f"{i}/{args.epochs}: {sep}")
     print()
     
     # Store result.
-    np.save(args.resdir + "prototypes-%dd-%dc.npy" %(args.dims, args.classes), \
-            prototypes.data.numpy())
+    np.save(f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c.npy",
+            prototypes.cpu().data.numpy())
