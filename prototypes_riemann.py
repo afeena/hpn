@@ -143,4 +143,5 @@ if __name__ == "__main__":
         print("%03d/%d: %.4f\r" % (i, args.epochs, sep))
 
     # Store result.
+    os.makedirs(args.resdir, exist_ok=True)
     np.save(f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c.npy", prototypes.cpu().data.numpy())
