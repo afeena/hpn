@@ -12,6 +12,7 @@
 
 import argparse
 import sys
+import time
 
 import numpy as np
 import torch
@@ -64,7 +65,8 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch):
         newloss = avgloss / avglosscount
 
         # Print updates.
-        print("Training epoch %d: loss %8.4f - %.0f\r" \
+        c_time = time.strftime("%d %m %Y %H:%M:%S", time.localtime())
+        print(c_time, " Training epoch %d: loss %8.4f - %.0f\r" \
               % (epoch, newloss, 100. * (bidx + 1) / len(trainloader)))
     print()
 
