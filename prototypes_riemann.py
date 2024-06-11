@@ -12,6 +12,8 @@ import argparse
 import os
 import random
 import sys
+import time
+
 import ledoh_torch
 import geoopt
 import numpy as np
@@ -142,7 +144,8 @@ if __name__ == "__main__":
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
-        print("%03d/%d: %.4f\r" % (i, args.epochs, sep))
+        c_time = time.strftime("%d %m %Y %H:%M:%S",time.localtime())
+        print(c_time," ", "%03d/%d: %.4f\r" % (i, args.epochs, sep))
 
     # Store result.
     os.makedirs(args.resdir, exist_ok=True)
