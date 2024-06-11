@@ -82,6 +82,8 @@ if __name__ == "__main__":
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
+    print(args)
+
     # Initialize prototypes and optimizer.
     if os.path.exists(args.wtvfile):
         print(f"initialiing prototypes with w2vec file {args.wtvfile}")
@@ -127,7 +129,7 @@ if __name__ == "__main__":
         if args.dispersion=='mmd':
             disp_loss = ledoh_torch.kernel_dispersion.KernelSphereDispersion().forward(prototypes)
         elif args.dispersion=='lloyd':
-            disp_loss = ledoh_torch.lloyd_dispersion.LloydSphereDispersion().forward(prototypes)
+            disp_loss = ledoh_torch.lloyd_dispersion.LloydSphereDispersion().forward(prototypes)[0]
         elif args.dispersion=='sliced':
             disp_loss = ledoh_torch.sliced_dispersion.SlicedSphereDispersion().forward(prototypes, p=None, q=None)
         else:

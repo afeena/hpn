@@ -143,6 +143,8 @@ if __name__ == "__main__":
     kwargs = {'num_workers': 32, 'pin_memory': True}
     args.dataset = "imagenet200"
 
+    print(args)
+
     # Set the random seeds.
     seed = args.seed
     torch.manual_seed(seed)
