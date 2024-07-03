@@ -82,7 +82,7 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch):
 # device (torch)             - Torch device, e.g. CUDA or CPU.
 # testloader (torch)         - Test data.
 #
-def main_test(model, device, testloader):
+def main_test(model, device, testloader, epoch, hpnfile):
     # Set model to evaluation and initialize accuracy and cosine similarity.
     model.eval()
     cos = nn.CosineSimilarity(eps=1e-9)
@@ -105,7 +105,8 @@ def main_test(model, device, testloader):
 
     # Print results.
     testlen = len(testloader.dataset)
-    print(f"Testing: classification accuracy: {acc}/{testlen} - {100. * acc / testlen}")
+    hpfile = hpnfile.split("/"[-1])
+    print(f"-#@x- Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | Hpnfile: {hpfile} -#@x-")
     return acc / float(testlen)
 
 
@@ -192,5 +193,5 @@ if __name__ == "__main__":
         # Train and test.
         main_train(model, device, trainloader, optimizer, f_loss, i)
         if i % 10 == 0 or i == args.epochs - 1:
-            t = main_test(model, device, testloader)
+            t = main_test(model, device, testloader, i, args.hpnfile)
             testscores.append([i, t])
