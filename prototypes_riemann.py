@@ -76,15 +76,15 @@ if __name__ == "__main__":
     "hpn": prototype_loss
     }
     dispersion_fn = disp_funcs[args.dispersion]
-    d_min, c_var = 0.0, 0.0
+
     for i in range(args.epochs):
+        optimizer.zero_grad()
         loss = dispersion_fn(prototypes)
-        d_min = ledoh_torch.minimum_acos_distance(prototypes.detach().clone(),prototypes.detach().clone())
-        c_var = ledoh_torch.circular_variance(prototypes.detach().clone())
         loss.backward()
         optimizer.step()
-        optimizer.zero_grad()
-        c_time = time.strftime("%d %m %Y %H:%M:%S",time.localtime())
+
+    d_min = ledoh_torch.minimum_acos_distance(prototypes.detach().clone(), prototypes.detach().clone())
+    c_var = ledoh_torch.circular_variance(prototypes.detach().clone())
     print(f"dim: {args.dims} classes: {args.classes} dispersion: {args.dispersion} lr: {args.learning_rate} epochs: {args.epochs}")
     print(f"Dmin {d_min.item()} Cvar {c_var.item()}")
 
