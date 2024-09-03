@@ -81,7 +81,7 @@ if __name__ == "__main__":
     dispersion_fn = disp_funcs[args.dispersion]
     for i in range(args.epochs):
         loss = dispersion_fn(prototypes)
-        d_min = ledoh_torch.minimum_acos_distance(prototypes.detach().clone())
+        d_min = ledoh_torch.minimum_acos_distance(prototypes.detach().clone(),prototypes.detach().clone())
         c_var = ledoh_torch.circular_variance(prototypes.detach().clone())
         loss.backward()
         optimizer.step()
