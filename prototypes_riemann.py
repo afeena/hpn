@@ -92,7 +92,7 @@ if __name__ == "__main__":
     # Store result.
     os.makedirs(args.resdir, exist_ok=True)
     if args.dispersion is not None:
-        fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c-{args.dispersion}-{args.dispersion_weight}dw.npy"
+        fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c-{args.dispersion}-{args.lr}lr.npy"
     else:
         fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c.npy"
     np.save(fn, prototypes.cpu().data.numpy())
