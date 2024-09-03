@@ -33,6 +33,7 @@ def parse_args():
     parser.add_argument('-c', dest="classes", default=100, type=int)
     parser.add_argument('-d', dest="dims", default=100, type=int)
     parser.add_argument('-l', dest="learning_rate", default=0.01, type=float)
+    parser.add_argument('-m', dest="momentum", default=0.9, type=float)
     parser.add_argument('-e', dest="epochs", default=10000, type=int)
     parser.add_argument('-s', dest="seed", default=300, type=int)
     parser.add_argument('-r', dest="resdir", default="", type=str)
