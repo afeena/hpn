@@ -58,9 +58,6 @@ if __name__ == "__main__":
     random.seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-
-    print(args)
-
     # Initialize prototypes.
     prototypes = torch.randn(args.classes, args.dims, device=device)
     prototypes = geoopt.ManifoldParameter(F.normalize(prototypes, p=2, dim=1), manifold=geoopt.SphereExact())
@@ -79,6 +76,7 @@ if __name__ == "__main__":
     "hpn": prototype_loss
     }
     dispersion_fn = disp_funcs[args.dispersion]
+    d_min, c_var = 0.0, 0.0
     for i in range(args.epochs):
         loss = dispersion_fn(prototypes)
         d_min = ledoh_torch.minimum_acos_distance(prototypes.detach().clone(),prototypes.detach().clone())
@@ -87,7 +85,8 @@ if __name__ == "__main__":
         optimizer.step()
         optimizer.zero_grad()
         c_time = time.strftime("%d %m %Y %H:%M:%S",time.localtime())
-        print(f"{c_time} Epoch {i} Loss {loss.item()} Dmin {d_min.item()} Cvar {c_var.item()}")
+    print(f"dim: {args.dims} classes: {args.classes} dispersion: {args.dispersion} lr: {args.learning_rate} epochs: {args.epochs}")
+    print(f"Dmin {d_min.item()} Cvar {c_var.item()}")
 
     # Store result.
     os.makedirs(args.resdir, exist_ok=True)
