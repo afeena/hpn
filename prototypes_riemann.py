@@ -41,7 +41,7 @@ def parse_args():
     parser.add_argument('-n', dest="nn", default=2, type=int)
     parser.add_argument('-o', dest="optim", default="rsgd", type=str)
     parser.add_argument('--disp', dest="dispersion", default=None, type=str)
-    parser.add_argument('--dis-params', dest="dispersion_params", default=None, type=str)
+    parser.add_argument('--dis-params', dest="dispersion_params", default="{}", type=str)
     args = parser.parse_args()
     return args
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     elif args.dispersion == "lloyd":
         dispersion_fn = ledoh_torch.lloyd_dispersion.LloydSphereDispersion(**dispersion_params)
     elif args.dispersion == "sliced":
-        dispersion_fn = ledoh_torch.sliced_dispersion.SlicedSphereDispersion(**dispersion_params)
+        dispersion_fn = ledoh_torch.sliced_dispersion.SlicedSphereDispersion()
     elif args.dispersion == "sliced-ax":
         dispersion_fn = ledoh_torch.sliced_batch.AxisAlignedBatchSphereDispersion(**dispersion_params)
 
