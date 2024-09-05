@@ -71,14 +71,15 @@ if __name__ == "__main__":
         raise ValueError("Unknown optimizer")
 
     dispersion_params = json.loads(args.dispersion_params)
-    disp_funcs = {
-    "mmd": ledoh_torch.kernel_dispersion.KernelSphereDispersion(**dispersion_params),
-    "lloyd": ledoh_torch.lloyd_dispersion.LloydSphereDispersion(**dispersion_params),
-    "sliced": ledoh_torch.sliced_dispersion.SlicedSphereDispersion(**dispersion_params),
-    "sliced-ax": ledoh_torch.sliced_batch.AxisAlignedBatchSphereDispersion(**dispersion_params),
-    "hpn": prototype_loss
-    }
-    dispersion_fn = disp_funcs[args.dispersion]
+    dispersion_fn = None
+    if args.dispersion == "mmd":
+        dispersion_fn = ledoh_torch.kernel_dispersion.KernelSphereDispersion(**dispersion_params)
+    elif args.dispersion == "lloyd":
+        dispersion_fn = ledoh_torch.lloyd_dispersion.LloydSphereDispersion(**dispersion_params)
+    elif args.dispersion == "sliced":
+        dispersion_fn = ledoh_torch.sliced_dispersion.SlicedSphereDispersion(**dispersion_params)
+    elif args.dispersion == "sliced-ax":
+        dispersion_fn = ledoh_torch.sliced_batch.AxisAlignedBatchSphereDispersion(**dispersion_params)
 
     for i in range(args.epochs):
         optimizer.zero_grad()
