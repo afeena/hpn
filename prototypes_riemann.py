@@ -18,6 +18,7 @@ import geoopt
 import numpy as np
 import torch
 import torch.nn.functional as F
+import json
 
 def prototype_loss(prototypes):
     # Dot product of normalized prototypes is cosine similarity.
@@ -40,6 +41,7 @@ def parse_args():
     parser.add_argument('-n', dest="nn", default=2, type=int)
     parser.add_argument('-o', dest="optim", default="rsgd", type=str)
     parser.add_argument('--disp', dest="dispersion", default=None, type=str)
+    parser.add_argument('--dis-params', dest="dispersion_params", default=None, type=str)
     args = parser.parse_args()
     return args
 
@@ -68,11 +70,12 @@ if __name__ == "__main__":
     else:
         raise ValueError("Unknown optimizer")
 
+    dispersion_params = json.loads(args.dispersion_params)
     disp_funcs = {
-    "mmd": ledoh_torch.kernel_dispersion.KernelSphereDispersion(),
-    "lloyd": ledoh_torch.lloyd_dispersion.LloydSphereDispersion(),
-    "sliced": ledoh_torch.sliced_dispersion.SlicedSphereDispersion(),
-    "sliced-ax": ledoh_torch.sliced_dispersion.AxisAlignedSlicedSphereDispersion(),
+    "mmd": ledoh_torch.kernel_dispersion.KernelSphereDispersion(**dispersion_params),
+    "lloyd": ledoh_torch.lloyd_dispersion.LloydSphereDispersion(**dispersion_params),
+    "sliced": ledoh_torch.sliced_dispersion.SlicedSphereDispersion(**dispersion_params),
+    "sliced-ax": ledoh_torch.sliced_batch.AxisAlignedBatchSphereDispersion(**dispersion_params),
     "hpn": prototype_loss
     }
     dispersion_fn = disp_funcs[args.dispersion]
@@ -91,7 +94,8 @@ if __name__ == "__main__":
     # Store result.
     os.makedirs(args.resdir, exist_ok=True)
     if args.dispersion is not None:
-        fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c-{args.dispersion}-{args.learning_rate}lr.npy"
+        disp_params_save = args.dispersion_params.replace('"', '').replace("{", "").replace("}", "").replace(":", "-").replace(",", "-").replace(" ", "")
+        fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c-{args.dispersion}-{disp_params_save}-{args.learning_rate}lr.npy"
     else:
         fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c.npy"
     np.save(fn, prototypes.cpu().data.numpy())
