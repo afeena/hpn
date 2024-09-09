@@ -80,6 +80,8 @@ if __name__ == "__main__":
         dispersion_fn = ledoh_torch.sliced_dispersion.SlicedSphereDispersion()
     elif args.dispersion == "sliced-ax":
         dispersion_fn = ledoh_torch.sliced_batch.AxisAlignedBatchSphereDispersion(**dispersion_params)
+    elif args.dispersion == "mma":
+        dispersion_fn = ledoh_torch.mma_dispersion.MMADispersion(**dispersion_params)
 
     for i in range(args.epochs):
         optimizer.zero_grad()
