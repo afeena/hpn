@@ -73,15 +73,19 @@ if __name__ == "__main__":
     dispersion_params = json.loads(args.dispersion_params)
     dispersion_fn = None
     if args.dispersion == "mmd":
-        dispersion_fn = ledoh_torch.kernel_dispersion.KernelSphereDispersion(**dispersion_params)
+        dispersion_fn = ledoh_torch.KernelSphereDispersion(**dispersion_params)
     elif args.dispersion == "lloyd":
-        dispersion_fn = ledoh_torch.lloyd_dispersion.LloydSphereDispersion(**dispersion_params)
+        dispersion_fn = ledoh_torch.LloydSphereDispersion(**dispersion_params)
     elif args.dispersion == "sliced":
-        dispersion_fn = ledoh_torch.sliced_dispersion.SlicedSphereDispersion()
+        dispersion_fn = ledoh_torch.SlicedSphereDispersion()
     elif args.dispersion == "sliced-ax":
-        dispersion_fn = ledoh_torch.sliced_batch.AxisAlignedBatchSphereDispersion(**dispersion_params)
+        dispersion_fn = ledoh_torch.AxisAlignedBatchSphereDispersion(**dispersion_params)
     elif args.dispersion == "mma":
-        dispersion_fn = ledoh_torch.mma_dispersion.MMADispersion(**dispersion_params)
+        dispersion_fn = ledoh_torch.MMADispersion(**dispersion_params)
+    elif args.dispersion == "mhe":
+        dispersion_fn= ledoh_torch.MHEDispersion(**dispersion_params)
+    elif args.dispersion == "koleo":
+        dispersion_fn = ledoh_torch.KoLeoDispersion(**dispersion_params)
 
     for i in range(args.epochs):
         optimizer.zero_grad()
