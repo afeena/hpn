@@ -102,7 +102,7 @@ if __name__ == "__main__":
     os.makedirs(args.resdir, exist_ok=True)
     if args.dispersion is not None:
         disp_params_save = args.dispersion_params.replace('"', '').replace("{", "").replace("}", "").replace(":", "-").replace(",", "-").replace(" ", "")
-        fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c-{args.dispersion}-{disp_params_save}-{args.learning_rate}lr.npy"
+        fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c-{args.dispersion}-{disp_params_save}-{args.learning_rate}lr-{args.epochs}e.npy"
     else:
         fn = f"{args.resdir}/prototypes-{args.dims}d-{args.classes}c.npy"
     np.save(fn, prototypes.cpu().data.numpy())
