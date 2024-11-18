@@ -218,4 +218,4 @@ if __name__ == "__main__":
             t = main_test(model, device, testloader, i, args.hpnfile, save_folder=save_folder)
             testscores.append([i, t])
             if save_folder is not None:
-                torch.save(model.state_dict(), f"{args.resdir}/model_epoch_{i}.pt")
+                torch.save(model.state_dict(), f"{save_folder}/model_epoch_{i}.pt")
