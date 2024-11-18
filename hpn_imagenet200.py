@@ -82,7 +82,7 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch):
 # device (torch)             - Torch device, e.g. CUDA or CPU.
 # testloader (torch)         - Test data.
 #
-def main_test(model, device, testloader, epoch, hpnfile):
+def main_test(model, device, testloader, epoch, hpnfile, save_folder=None):
     # Set model to evaluation and initialize accuracy and cosine similarity.
     model.eval()
     cos = nn.CosineSimilarity(eps=1e-9)
@@ -90,6 +90,7 @@ def main_test(model, device, testloader, epoch, hpnfile):
 
     # Go over all batches.
     with torch.no_grad():
+        results = []
         for data, target in testloader:
             # Data to device.
             data = torch.autograd.Variable(data).cuda()
@@ -101,12 +102,18 @@ def main_test(model, device, testloader, epoch, hpnfile):
             output = model.predict(output).float()
 
             pred = output.max(1, keepdim=True)[1]
+            results.append((pred.cpu().numpy(), target.cpu().numpy()))
             acc += pred.eq(target.view_as(pred)).sum().item()
 
     # Print results.
     testlen = len(testloader.dataset)
-    hpfile = hpnfile.split("/"[-1])
-    print(f"-#@x- Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | Hpnfile: {hpfile} -#@x-")
+    hpfile = hpnfile.split("/")[-1]
+    if save_folder is not None:
+        with open(f"{save_folder}/test_acc.log", "a") as f:
+            f.write(f"-#@x- Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | Hpnfile: {hpfile} -#@x-\n")
+            np.save(f"{save_folder}/test_epoch_{epoch}", results)
+    else:
+        print(f"Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | Hpnfile: {hpfile}")
     return acc / float(testlen)
 
 
@@ -132,6 +139,7 @@ def parse_args():
     parser.add_argument("--drop1", dest="drop1", default=100, type=int)
     parser.add_argument("--drop2", dest="drop2", default=200, type=int)
     parser.add_argument("--seed", dest="seed", default=100, type=int)
+    parser.add_argument("--save", dest="save", default=None, type=str)
     args = parser.parse_args()
     return args
 
@@ -155,6 +163,16 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
 
+    if args.save is not None:
+        import hashlib
+        from datetime import datetime
+        h = hashlib.shake_256()
+        save_str = str(args.hpnfile) + " "+str(datetime.now())
+        h.update(save_str.encode())
+        save_folder = f"{args.save}/{h.hexdigest(10)}"
+
+    else:
+        save_folder = None
     # Load data.
     batch_size = args.batch_size
     trainloader, testloader = helper.load_imagenet200(args.datadir, \
@@ -192,6 +210,8 @@ if __name__ == "__main__":
 
         # Train and test.
         main_train(model, device, trainloader, optimizer, f_loss, i)
-        if i % 10 == 0 or i == args.epochs - 1:
-            t = main_test(model, device, testloader, i, args.hpnfile)
+        if i % 100 == 0 or i == args.epochs - 1:
+            t = main_test(model, device, testloader, i, args.hpnfile, save_folder=save_folder)
             testscores.append([i, t])
+            if save_folder is not None:
+                torch.save(model.state_dict(), f"{args.save}/model_epoch_{i}.pt")
