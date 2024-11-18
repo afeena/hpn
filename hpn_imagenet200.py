@@ -107,7 +107,7 @@ def main_test(model, device, testloader, epoch, hpnfile, save_folder=None):
             results.append(np.concatenate((pred.cpu().numpy(), target.view_as(pred).cpu().numpy()), axis=1))
             acc += pred.eq(target.view_as(pred)).sum().item()
 
-    results = np.array(results)
+    results = np.concatenate(results, axis=0)
     # Print results.
     testlen = len(testloader.dataset)
     hpfile = hpnfile.split("/")[-1]
