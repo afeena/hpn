@@ -66,7 +66,7 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch, save_folder
 
         # Compute outputs and losses.
         output = model(data)
-        loss = (1 - f_loss(output, target)).pow(2).sum()
+        loss = f_loss(output, target)
 
         # Backpropagation.
         optimizer.zero_grad()
@@ -116,10 +116,8 @@ def main_test(model, device, testloader, epoch, hpnfile, save_folder=None):
             target = torch.autograd.Variable(target)
 
             # Forward.
-            output = model(data).float()
-            output = model.predict(output).float()
-
-            pred = output.max(1, keepdim=True)[1]
+            output = model(data)
+            _, pred = torch.max(output.data, 1)
             results.append(np.concatenate((pred.cpu().numpy(), target.view_as(pred).cpu().numpy()), axis=1))
             acc += pred.eq(target.view_as(pred)).sum().item()
 
@@ -182,7 +180,7 @@ if __name__ == "__main__":
     if args.resdir is not None:
         exp_number = get_experiment_number(args.resdir)
         hpn_str = args.hpnfile.split('/')[-1].split(".")[0].replace("-", "")
-        exp_name = f"{format(exp_number, '05d')}_imagenet200_npn_{args.network}_proto_{hpn_str}"
+        exp_name = f"{format(exp_number, '05d')}_imagenet200_supervised_{args.network}_proto_{hpn_str}"
         save_folder = f"{args.resdir}/{exp_name}"
     else:
         save_folder = None
@@ -203,9 +201,9 @@ if __name__ == "__main__":
 
     # Load the model.
     if args.network == "resnet32":
-        model = resnet.ResNet(32, args.output_dims, 1, classpolars)
+        model = resnet.ResNet(32, nr_classes, 1)
     elif args.network == "densenet121":
-        model = densenet.DenseNet121(args.output_dims, classpolars)
+        model = densenet.DenseNet121(args.output_dims)
     model = model.to(device)
 
     # Load the optimizer.
@@ -213,7 +211,7 @@ if __name__ == "__main__":
                                      args.learning_rate, args.momentum, args.decay)
 
     # Initialize the loss functions.
-    f_loss = nn.CosineSimilarity(eps=1e-9).cuda()
+    f_loss = nn.CrossEntropyLoss()
 
     # Main loop.
     testscores = []
