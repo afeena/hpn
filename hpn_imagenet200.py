@@ -11,6 +11,8 @@
 #
 
 import argparse
+import json
+import os
 import sys
 import time
 
@@ -154,8 +156,6 @@ if __name__ == "__main__":
     kwargs = {'num_workers': 32, 'pin_memory': True}
     args.dataset = "imagenet200"
 
-    print(args)
-
     # Set the random seeds.
     seed = args.seed
     torch.manual_seed(seed)
@@ -170,9 +170,13 @@ if __name__ == "__main__":
         save_str = str(args.hpnfile) + " "+str(datetime.now())
         h.update(save_str.encode())
         save_folder = f"{args.save}/{h.hexdigest(10)}"
-
     else:
         save_folder = None
+
+    if save_folder is not None:
+        os.makedirs(save_folder, exist_ok=True)
+        with open(f"{save_folder}/config.json", "w") as f:
+                json.dump(args.__dict__, f, indent=2)
     # Load data.
     batch_size = args.batch_size
     trainloader, testloader = helper.load_imagenet200(args.datadir, \
