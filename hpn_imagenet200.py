@@ -141,7 +141,6 @@ def parse_args():
     parser.add_argument("--drop1", dest="drop1", default=100, type=int)
     parser.add_argument("--drop2", dest="drop2", default=200, type=int)
     parser.add_argument("--seed", dest="seed", default=100, type=int)
-    parser.add_argument("--save", dest="save", default=None, type=str)
     args = parser.parse_args()
     return args
 
@@ -163,7 +162,7 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
 
-    if args.save is not None:
+    if args.resdir is not None:
         import hashlib
         from datetime import datetime
         h = hashlib.shake_256()
