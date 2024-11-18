@@ -82,7 +82,7 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch, save_folder
         c_time = time.strftime("%d %m %Y %H:%M:%S", time.localtime())
         if save_folder is not None:
             with open(f"{save_folder}/train_loss.log", "a") as f:
-                f.write(f"{c_time} Training epoch {epoch}: loss {newloss} - {100. * (bidx + 1) / len(trainloader)}\n")
+                f.write(f"{c_time} Training epoch {epoch} | Batch: {bidx} / {len(trainloader)} | loss {newloss} | progress(%): {100. * (bidx + 1) / len(trainloader)}\n")
         else:
             print(c_time, " Training epoch %d: loss %8.4f - %.0f\r" \
               % (epoch, newloss, 100. * (bidx + 1) / len(trainloader)))
