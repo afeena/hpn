@@ -180,7 +180,7 @@ if __name__ == "__main__":
     if args.resdir is not None:
         exp_number = get_experiment_number(args.resdir)
         hpn_str = args.hpnfile.split('/')[-1].split(".")[0].replace("-", "")
-        exp_name = f"{format(exp_number, '05d')}_imagenet200_supervised_{args.network}_proto_{hpn_str}"
+        exp_name = f"{format(exp_number, '05d')}_imagenet200_supervised_{args.network}"
         save_folder = f"{args.resdir}/{exp_name}"
     else:
         save_folder = None
