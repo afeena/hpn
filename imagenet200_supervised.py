@@ -195,10 +195,6 @@ if __name__ == "__main__":
                                                       batch_size, kwargs)
     nr_classes = 200
 
-    # Load the polars and update the trainy labels.
-    classpolars = torch.from_numpy(np.load(args.hpnfile)).float()
-    args.output_dims = int(args.hpnfile.split("/")[-1].split("-")[1][:-1])
-
     # Load the model.
     if args.network == "resnet32":
         model = resnet.ResNet(32, nr_classes, 1)
