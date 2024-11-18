@@ -25,6 +25,18 @@ import helper
 sys.path.append("models/imagenet200/")
 from models.imagenet200 import densenet, resnet
 
+def get_experiment_number(models_path):
+    import os
+    import re
+
+    occupied = sorted([int(x.split("_")[0]) for x in os.listdir(models_path)
+                       if re.match("^\d+$", x.split("_")[0])])
+    occupied = set(occupied)
+
+    full = set([x for x in range(10000)])
+
+    avaliable = full.difference(occupied)
+    return avaliable.pop()
 
 ################################################################################
 # Training epoch.
@@ -164,12 +176,10 @@ if __name__ == "__main__":
     np.random.seed(seed)
 
     if args.resdir is not None:
-        import hashlib
-        from datetime import datetime
-        h = hashlib.shake_256()
-        save_str = str(args.hpnfile) + " "+str(datetime.now())
-        h.update(save_str.encode())
-        save_folder = f"{args.resdir}/{h.hexdigest(10)}"
+        exp_number = get_experiment_number(args.resdir)
+        hpn_str = args.hpnfile.split('/')[-1].split(".")[0].replace("-", "")
+        exp_name = f"{format(exp_number, '05d')}_imagenet200_{args.network}_proto_{hpn_str}"
+        save_folder = f"{args.resdir}/{exp_name}"
     else:
         save_folder = None
 
