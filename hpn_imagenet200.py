@@ -52,7 +52,7 @@ def get_experiment_number(models_path):
 # f_loss (torch)      - Loss function.
 # epoch (int)         - Epoch iteration.
 #
-def main_train(model, device, trainloader, optimizer, f_loss, epoch):
+def main_train(model, device, trainloader, optimizer, f_loss, epoch, save_folder=None):
     # Set mode to training.
     model.train()
     avgloss, avglosscount = 0., 0.
@@ -80,7 +80,11 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch):
 
         # Print updates.
         c_time = time.strftime("%d %m %Y %H:%M:%S", time.localtime())
-        print(c_time, " Training epoch %d: loss %8.4f - %.0f\r" \
+        if save_folder is not None:
+            with open(f"{save_folder}/train_loss.log", "a") as f:
+                f.write(f"{c_time} Training epoch {epoch}: loss {newloss} - {100. * (bidx + 1) / len(trainloader)}\n")
+        else:
+            print(c_time, " Training epoch %d: loss %8.4f - %.0f\r" \
               % (epoch, newloss, 100. * (bidx + 1) / len(trainloader)))
     print()
 
@@ -223,7 +227,7 @@ if __name__ == "__main__":
                 param_group['lr'] = learning_rate
 
         # Train and test.
-        main_train(model, device, trainloader, optimizer, f_loss, i)
+        main_train(model, device, trainloader, optimizer, f_loss, i, save_folder=save_folder)
         if i % 100 == 0 or i == args.epochs - 1:
             t = main_test(model, device, testloader, i, args.hpnfile, save_folder=save_folder)
             testscores.append([i, t])
