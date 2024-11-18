@@ -104,16 +104,17 @@ def main_test(model, device, testloader, epoch, hpnfile, save_folder=None):
             output = model.predict(output).float()
 
             pred = output.max(1, keepdim=True)[1]
-            results.append((pred.cpu().numpy(), target.cpu().numpy()))
+            results.append(np.concatenate((pred.cpu().numpy(), target.cpu().numpy()), axis=0))
             acc += pred.eq(target.view_as(pred)).sum().item()
 
+    results = np.array(results)
     # Print results.
     testlen = len(testloader.dataset)
     hpfile = hpnfile.split("/")[-1]
     if save_folder is not None:
         with open(f"{save_folder}/test_acc.log", "a") as f:
             f.write(f"-#@x- Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | Hpnfile: {hpfile} -#@x-\n")
-            np.save(f"{save_folder}/test_epoch_{epoch}", results)
+        np.save(f"{save_folder}/test_epoch_{epoch}", results)
     else:
         print(f"Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | Hpnfile: {hpfile}")
     return acc / float(testlen)
