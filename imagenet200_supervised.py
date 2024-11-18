@@ -60,7 +60,6 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch, save_folder
     # Go over all batches.
     for bidx, (data, target) in enumerate(trainloader):
         # Data to device.
-        target = model.polars[target]
         data = torch.autograd.Variable(data).cuda()
         target = torch.autograd.Variable(target).cuda()
 
