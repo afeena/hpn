@@ -122,13 +122,12 @@ def main_test(model, device, testloader, epoch, save_folder=None):
     results = np.concatenate(results, axis=0)
     # Print results.
     testlen = len(testloader.dataset)
-    hpfile = hpnfile.split("/")[-1]
     if save_folder is not None:
         with open(f"{save_folder}/test_acc.log", "a") as f:
-            f.write(f"-#@x- Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | Hpnfile: {hpfile} -#@x-\n")
+            f.write(f"-#@x- Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | -#@x-\n")
         np.save(f"{save_folder}/test_epoch_{epoch}", results)
     else:
-        print(f"Epoch: {epoch} | Accuracy: {100. * acc / testlen}, | Hpnfile: {hpfile}")
+        print(f"Epoch: {epoch} | Accuracy: {100. * acc / testlen}")
     return acc / float(testlen)
 
 
