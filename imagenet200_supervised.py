@@ -99,10 +99,9 @@ def main_train(model, device, trainloader, optimizer, f_loss, epoch, save_folder
 # device (torch)             - Torch device, e.g. CUDA or CPU.
 # testloader (torch)         - Test data.
 #
-def main_test(model, device, testloader, epoch, hpnfile, save_folder=None):
+def main_test(model, device, testloader, epoch, save_folder=None):
     # Set model to evaluation and initialize accuracy and cosine similarity.
     model.eval()
-    cos = nn.CosineSimilarity(eps=1e-9)
     acc = 0
 
     # Go over all batches.
@@ -116,7 +115,7 @@ def main_test(model, device, testloader, epoch, hpnfile, save_folder=None):
 
             # Forward.
             output = model(data)
-            _, pred = torch.max(output.data, 1)
+            _, pred = torch.max(output.data, 1, keepdim=True)
             results.append(np.concatenate((pred.cpu().numpy(), target.view_as(pred).cpu().numpy()), axis=1))
             acc += pred.eq(target.view_as(pred)).sum().item()
 
@@ -222,7 +221,7 @@ if __name__ == "__main__":
         # Train and test.
         main_train(model, device, trainloader, optimizer, f_loss, i, save_folder=save_folder)
         if i % 100 == 0 or i == args.epochs - 1:
-            t = main_test(model, device, testloader, i, args.hpnfile, save_folder=save_folder)
+            t = main_test(model, device, testloader, i, save_folder=save_folder)
             testscores.append([i, t])
             if save_folder is not None:
                 torch.save(model.state_dict(), f"{save_folder}/model_epoch_{i}.pt")
