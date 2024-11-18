@@ -104,7 +104,7 @@ def main_test(model, device, testloader, epoch, hpnfile, save_folder=None):
             output = model.predict(output).float()
 
             pred = output.max(1, keepdim=True)[1]
-            results.append(np.concatenate((pred.cpu().numpy(), target.cpu().numpy()), axis=0))
+            results.append(np.concatenate((pred.cpu().numpy(), target.view_as(pred).cpu().numpy()), axis=1))
             acc += pred.eq(target.view_as(pred)).sum().item()
 
     results = np.array(results)
