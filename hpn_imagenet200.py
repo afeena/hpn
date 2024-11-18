@@ -168,7 +168,7 @@ if __name__ == "__main__":
         h = hashlib.shake_256()
         save_str = str(args.hpnfile) + " "+str(datetime.now())
         h.update(save_str.encode())
-        save_folder = f"{args.save}/{h.hexdigest(10)}"
+        save_folder = f"{args.resdir}/{h.hexdigest(10)}"
     else:
         save_folder = None
 
