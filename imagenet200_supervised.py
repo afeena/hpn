@@ -177,10 +177,12 @@ if __name__ == "__main__":
     if args.resdir is not None:
         exp_number = get_experiment_number(args.resdir)
         hpn_str = args.hpnfile.split('/')[-1].split(".")[0].replace("-", "")
-        exp_name = f"{format(exp_number, '05d')}_imagenet200_supervised_{args.network}"
+        exp_name = f"{format(exp_number, '05d')}_imagenet200_supervised_{args.network}_{hpn_str}"
         save_folder = f"{args.resdir}/{exp_name}"
     else:
         save_folder = None
+
+    assert save_folder is not None, "Please specify a result directory with --resdir"
 
     if save_folder is not None:
         os.makedirs(save_folder, exist_ok=True)
@@ -192,11 +194,8 @@ if __name__ == "__main__":
                                                       batch_size, kwargs)
     nr_classes = 200
 
-    # Load the model.
-    if args.network == "resnet32":
-        model = resnet.ResNet(32, nr_classes, 1)
-    elif args.network == "densenet121":
-        model = densenet.DenseNet121(args.output_dims)
+
+    model = resnet.ResNet(50, nr_classes, 1)
     model = model.to(device)
 
     # Load the optimizer.
